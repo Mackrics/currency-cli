@@ -2,24 +2,25 @@
 
 #------------------- Set variables -----------------------------------------#
 AMOUNT=$( if [[ $1 == "" ]] ; then
-	echo "1"
+	echo "1" # Feel free to change this default
 else
 	echo $1
 fi)
 
 FROM=$( if [[ $2 == "" ]] ; then
-	echo "DKK"
+	echo "DKK" # Feel free to change this default
 else
 	echo $2 | tr '[:lower:]' '[:upper:]'
 fi)
 
 TO=$( if [[ $3 == "" ]] ; then
-	echo "SEK"
+	echo "SEK" # Feel free to change this default
 else
 	echo $3 | tr '[:lower:]' '[:upper:]'
 fi)
 
 DATE=$( if [[ $4 == "" ]] ; then
+	# Today's date is not always available and will cause errors when it is not.
 	echo $(date --date "yesterday" +%Y-%m-%d)
 else
 	echo $4
