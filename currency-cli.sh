@@ -1,4 +1,6 @@
 #!/usr/bin/mksh
+
+#------------------- Set variables -----------------------------------------#
 AMOUNT=$( if [[ $1 == "" ]] ; then
 	echo "1"
 else
@@ -23,7 +25,9 @@ else
 	echo $4
 fi)
 
-echo Converting $AMOUNT $FROM to $TO at $DATE...
+echo -e "Converting $AMOUNT $FROM to $TO at $DATE... \n"
+
+#----------------------conversion--------------------------------------------#
 
 if [[ $FROM == "EUR" || $TO == "EUR" ]] ; then
 	if [[ $TO == "EUR" ]] ; then
@@ -31,21 +35,20 @@ if [[ $FROM == "EUR" || $TO == "EUR" ]] ; then
 			https://sdw-wsrest.ecb.europa.eu/service/data/EXR/D.$FROM.EUR.SP00.A?startPeriod=$DATE --silent |
 			grep ObsValue | awk 'NR==1' | cut -d "\"" -f2)
 			if [[ $EXR == "" ]] ; then
-				echo "Date is not available. Please select another date."
+				echo -e "Date is not available. Please select another date. \n"
 			else
 				CONVERSION=$(awk "BEGIN {print($AMOUNT/$EXR)}")
 				echo $AMOUNT $FROM is $CONVERSION $TO
 			fi
-
 	elif [[ $FROM == "EUR" ]] ; then
 		EXR=$(curl \\\
 			https://sdw-wsrest.ecb.europa.eu/service/data/EXR/D.$TO.EUR.SP00.A?startPeriod=$DATE --silent |
 				grep ObsValue | awk 'NR==1' | cut -d "\"" -f2)
 			if [[ $EXR == "" ]] ; then
-				echo "Date is not available. Please select another date."
+				echo -e "Date is not available. Please select another date. \n"
 			else
 				CONVERSION=$(awk "BEGIN {print($AMOUNT*$EXR)}")
-				echo $AMOUNT $FROM is $CONVERSION $TO at $DATE
+				echo -e "$AMOUNT $FROM is $CONVERSION $TO at $DATE \n"
 			fi
 	fi
 	else
@@ -57,11 +60,11 @@ if [[ $FROM == "EUR" || $TO == "EUR" ]] ; then
 			https://sdw-wsrest.ecb.europa.eu/service/data/EXR/D.$TO.EUR.SP00.A?startPeriod=$DATE --silent |
 			grep ObsValue | awk 'NR==1' | cut -d "\"" -f2)
 		if [[ $EXR_TO == "" ]] ; then
-			echo "The currency you want to convert to or the date is not available :("
+			echo -e "The currency you want to convert to or the date is not available :( \n"
 		elif [[ $EXR_FROM == "" ]] ; then
-			echo "The currency you want from convert to or the date is not available :("
+			echo -e "The currency you want from convert to or the date is not available :( \n"
 		else
 			CONVERSION=$(awk "BEGIN {print($AMOUNT*$EXR_TO/$EXR_FROM)}")
-			echo $AMOUNT $FROM is $CONVERSION $TO at $DATE
+			echo -e "$AMOUNT $FROM is $CONVERSION $TO at $DATE \n"
 		fi
 fi
