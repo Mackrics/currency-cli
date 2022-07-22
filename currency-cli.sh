@@ -1,42 +1,67 @@
 #!/usr/bin/mksh
-AMOUNT=$1
-FROM=$(echo $2 | tr '[:lower:]' '[:upper:]')
-TO=$(echo $3 | tr '[:lower:]' '[:upper:]')
+AMOUNT=$( if [[ $1 == "" ]] ; then
+	echo "1"
+else
+	echo $1
+fi)
+
+FROM=$( if [[ $2 == "" ]] ; then
+	echo "DKK"
+else
+	echo $2 | tr '[:lower:]' '[:upper:]'
+fi)
+
+TO=$( if [[ $3 == "" ]] ; then
+	echo "SEK"
+else
+	echo $3 | tr '[:lower:]' '[:upper:]'
+fi)
+
+DATE=$( if [[ $4 == "" ]] ; then
+	echo $(date --date "yesterday" +%Y-%m-%d)
+else
+	echo $4
+fi)
+
+echo Converting $AMOUNT $FROM to $TO at $DATE...
 
 if [[ $FROM == "EUR" || $TO == "EUR" ]] ; then
 	if [[ $TO == "EUR" ]] ; then
 		EXR=$(curl \\\
-			https://sdw-wsrest.ecb.europa.eu/service/data/EXR/D.$FROM.EUR.SP00.A?startPeriod=$(date +%Y-%m-%d) --silent |
-			grep ObsValue | cut -d "\"" -f2)
+			https://sdw-wsrest.ecb.europa.eu/service/data/EXR/D.$FROM.EUR.SP00.A?startPeriod=$DATE --silent |
+			grep ObsValue | awk 'NR==1' | cut -d "\"" -f2)
+			if [[ $EXR == "" ]] ; then
+				echo "Date is not available. Please select another date."
+			else
+				CONVERSION=$(awk "BEGIN {print($AMOUNT/$EXR)}")
+				echo $AMOUNT $FROM is $CONVERSION $TO
+			fi
 
-			CONVERSION=$(awk "BEGIN {print($AMOUNT/$EXR)}")
-
-			echo $AMOUNT $FROM is $CONVERSION $TO
 	elif [[ $FROM == "EUR" ]] ; then
 		EXR=$(curl \\\
-			https://sdw-wsrest.ecb.europa.eu/service/data/EXR/D.$TO.EUR.SP00.A?startPeriod=$(date +%Y-%m-%d) --silent |
-			grep ObsValue | cut -d "\"" -f2)
-
-			CONVERSION=$(awk "BEGIN {print($AMOUNT*$EXR)}")
-
-			echo $AMOUNT $FROM is $CONVERSION $TO
+			https://sdw-wsrest.ecb.europa.eu/service/data/EXR/D.$TO.EUR.SP00.A?startPeriod=$DATE --silent |
+				grep ObsValue | awk 'NR==1' | cut -d "\"" -f2)
+			if [[ $EXR == "" ]] ; then
+				echo "Date is not available. Please select another date."
+			else
+				CONVERSION=$(awk "BEGIN {print($AMOUNT*$EXR)}")
+				echo $AMOUNT $FROM is $CONVERSION $TO at $DATE
+			fi
 	fi
 	else
 		EXR_FROM=$(curl \\\
-			https://sdw-wsrest.ecb.europa.eu/service/data/EXR/D.$FROM.EUR.SP00.A?startPeriod=$(date +%Y-%m-%d) --silent |
-			grep ObsValue | cut -d "\"" -f2)
+			https://sdw-wsrest.ecb.europa.eu/service/data/EXR/D.$FROM.EUR.SP00.A?startPeriod=$DATE --silent |
+			grep ObsValue | awk 'NR==1' | cut -d "\"" -f2)
 
 		EXR_TO=$(curl \\\
-			https://sdw-wsrest.ecb.europa.eu/service/data/EXR/D.$TO.EUR.SP00.A?startPeriod=$(date +%Y-%m-%d) --silent |
-			grep ObsValue | cut -d "\"" -f2)
-
-		CONVERSION=$(awk "BEGIN {print($AMOUNT*$EXR_TO/$EXR_FROM)}")
-
+			https://sdw-wsrest.ecb.europa.eu/service/data/EXR/D.$TO.EUR.SP00.A?startPeriod=$DATE --silent |
+			grep ObsValue | awk 'NR==1' | cut -d "\"" -f2)
 		if [[ $EXR_TO == "" ]] ; then
-			echo "The currency you want to convert from is not available :("
+			echo "The currency you want to convert to or the date is not available :("
 		elif [[ $EXR_FROM == "" ]] ; then
-			echo "The currency you want to convert from is not available :("
+			echo "The currency you want from convert to or the date is not available :("
 		else
-			echo $AMOUNT $FROM is $CONVERSION $TO
+			CONVERSION=$(awk "BEGIN {print($AMOUNT*$EXR_TO/$EXR_FROM)}")
+			echo $AMOUNT $FROM is $CONVERSION $TO at $DATE
 		fi
 fi
