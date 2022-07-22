@@ -18,7 +18,7 @@ The program requires three arguments:
 1. The amount you wish to convert (default is 1).
 2. The currency you convert from (default is DKK).
 3. The currency you convert to (default is SEK).
-4. The date you wish to retrieve the conversion from (default is yesterday).
+4. The date you want the exchange rate from (default is yesterday).
 
 Example:
 ```
