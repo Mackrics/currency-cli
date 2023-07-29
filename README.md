@@ -6,21 +6,23 @@ A shell script which utilize the ECB api to convert currencies!
 ## Installation
 
 ```
-git clone https://codeberg.org/mackan/currency-cli
+git clone https://github.com/Mackrics/currency-cli
 cd currency-cli
 chmod +x currency-cli.sh
 ```
 
 ## Usage
 
-The program requires three arguments:
+Think for yourself "What is 10 euros in danish kronor?", then enter "10 eur dkk".
 
-1. The amount you wish to convert (default is 1).
-2. The currency you convert from (default is DKK).
-3. The currency you convert to (default is SEK).
-4. The date you want the exchange rate from (default is yesterday).
-
-Example:
 ```
 ./currency-cli 10 EUR DKK 2022-07-21
+```
+
+## Help
+
+The source code is documentation, to print it:
+
+```
+./currency-cli -h
 ```
