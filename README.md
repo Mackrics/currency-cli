@@ -1,6 +1,6 @@
 # currency-cli
 
-A shell script which utilize the ECB api to convert currencies!
+A shell script which utilize the [frankfurter.app](https://frankfurter.app) api
 
 
 ## Installation
@@ -16,12 +16,12 @@ chmod +x currency-cli.sh
 Think for yourself "What is 10 euros in danish kronor?", then enter "10 eur dkk".
 
 ```
-./currency-cli 10 EUR DKK 2022-07-21
+./currency-cli 10 eur dkk
 ```
 
 ## Help
 
-The source code is documentation, to print it:
+The source code is the documentation, to print it:
 
 ```
 ./currency-cli -h
